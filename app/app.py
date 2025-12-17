@@ -64,7 +64,7 @@ model, test_accuracy = train_model(X, y)
 # --------------------------------------------------
 # 4) Streamlit UI
 # --------------------------------------------------
-st.title("📉 Telco Customer Churn Predictor")
+st.title(" Telco Customer Churn Predictor")
 st.write(
     "This demo app uses a **Logistic Regression** model trained on the Telco Customer Churn dataset "
     "to estimate the probability that a customer will churn."
