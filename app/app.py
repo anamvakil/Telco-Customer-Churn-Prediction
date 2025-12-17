@@ -7,11 +7,10 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-
 st.set_page_config(page_title="Telco Churn Predictor", layout="centered")
 
 # --------------------------------------------------
-# 1) Load data (from repo, not local computer)
+# 1) Load data (from repo)
 # --------------------------------------------------
 @st.cache_data
 def load_data():
@@ -23,7 +22,9 @@ def load_data():
 
 df = load_data()
 
-# Features used for the model / UI
+# --------------------------------------------------
+# 2) Features used for model + UI
+# --------------------------------------------------
 features = ["Contract", "PaymentMethod", "InternetService", "tenure", "MonthlyCharges"]
 X = df[features]
 y = df["Churn"]
@@ -32,8 +33,7 @@ numeric_features = ["tenure", "MonthlyCharges"]
 categorical_features = ["Contract", "PaymentMethod", "InternetService"]
 
 # --------------------------------------------------
-# 2) Build preprocessing + model (train inside app)
-#    (Later you can save/load model, but this is fine for demo)
+# 3) Build preprocessing + model (cached)
 # --------------------------------------------------
 @st.cache_resource
 def train_model(X, y):
@@ -54,6 +54,7 @@ def train_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, stratify=y, random_state=42
     )
+
     model.fit(X_train, y_train)
     test_accuracy = model.score(X_test, y_test)
     return model, test_accuracy
@@ -61,12 +62,12 @@ def train_model(X, y):
 model, test_accuracy = train_model(X, y)
 
 # --------------------------------------------------
-# 3) Streamlit UI
+# 4) Streamlit UI
 # --------------------------------------------------
-st.title("Telco Customer Churn Predictor")
+st.title("📉 Telco Customer Churn Predictor")
 st.write(
-    "This demo app uses a Logistic Regression model trained on the Telco Customer Churn dataset "
-    "to predict whether a customer is likely to churn."
+    "This demo app uses a **Logistic Regression** model trained on the Telco Customer Churn dataset "
+    "to estimate the probability that a customer will churn."
 )
 
 st.metric("Model Test Accuracy", f"{test_accuracy:.2%}")
@@ -103,6 +104,7 @@ monthly_charges = st.slider(
     step=1.0,
 )
 
+# One-row DataFrame for prediction
 input_data = pd.DataFrame(
     {
         "Contract": [contract],
@@ -114,20 +116,19 @@ input_data = pd.DataFrame(
 )
 
 # --------------------------------------------------
-# 4) Predict + show risk band
+# 5) Risk band helper
 # --------------------------------------------------
-proba = float(model.predict_proba(input_data)[0][1])  # probability of churn (1)
-
 def risk_band(message, color):
     st.markdown(
         f"""
         <div style="
             padding: 14px;
-            border-radius: 12px;
+            border-radius: 14px;
             background: {color};
             color: white;
             font-weight: 800;
             text-align: center;
+            font-size: 1.05rem;
         ">
             {message}
         </div>
@@ -135,13 +136,22 @@ def risk_band(message, color):
         unsafe_allow_html=True,
     )
 
+# --------------------------------------------------
+# 6) Prediction (ONLY when button clicked)
+# --------------------------------------------------
 st.subheader("Prediction")
 
-st.write(f"Churn Probability: **{proba:.2%}**")
+if st.button("Predict Churn Risk"):
+    proba = float(model.predict_proba(input_data)[0][1])  # probability of churn (1)
 
-if proba >= 0.55:
-    risk_band("High churn risk", "#d32f2f")       # red
-elif proba >= 0.35:
-    risk_band("Moderate churn risk", "#f57c00")   # orange
+    st.write(f"Churn Probability: **{proba:.2%}**")
+
+    # ✅ Your exact thresholds + categories
+    if proba >= 0.55:
+        risk_band("High churn risk", "#d32f2f")       # red
+    elif proba >= 0.35:
+        risk_band("Moderate churn risk", "#f57c00")   # orange
+    else:
+        risk_band("Low churn risk", "#388e3c")        # green
 else:
-    risk_band("Low churn risk", "#388e3c")        # green
+    st.info("Adjust the inputs, then click **Predict Churn Risk**.")
