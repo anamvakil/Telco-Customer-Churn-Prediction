@@ -29,6 +29,10 @@ Multiple models were evaluated during development.
 ## Results
 The final workflow provides a stable and interpretable churn prediction pipeline.  
 The model can be used to identify high-risk customers and support targeted retention efforts.
+A simple demo interface was developed to showcase the churn prediction workflow and model outputs.
+The demo allows users to interact with the model and observe churn predictions based on input features.
+
+*(Live demo link or screenshots are included in the repository.)*
 
 ## Tools & Technologies
 - Python
@@ -36,5 +40,14 @@ The model can be used to identify high-risk customers and support targeted reten
 - Scikit-learn
 - Matplotlib / Seaborn
 - Jupyter Notebook
+- Streamlit (demo interface)
 
 ## Repository Structure
+telco-churn-prediction/
+├── notebooks/ # EDA and model development notebooks
+├── report/ # IEEE-style project report (PDF)
+├── screenshots/ # Visual outputs and results
+├── requirements.txt
+└── README.md
+
+
