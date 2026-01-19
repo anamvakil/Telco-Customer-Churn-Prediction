@@ -1,4 +1,4 @@
-# Telco-Churn-Prediction
+# Telco-Customer-Churn-Prediction
 Customer churn prediction using machine learning and cross-validation
 
 ## Overview
